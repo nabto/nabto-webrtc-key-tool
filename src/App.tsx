@@ -11,7 +11,12 @@ import {
   Button,
   Container,
   CssBaseline,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Drawer,
+  IconButton,
   List,
   ListItem,
   ListItemButton,
@@ -21,33 +26,68 @@ import {
   Toolbar,
   Typography
 } from '@mui/material'
+import { ContentCopy as CopyIcon } from '@mui/icons-material'
 import FormCard from './components/FormCard'
 import SectionHeader from './components/SectionHeader'
+import CopyField from './components/CopyField'
+import { generateKeyPair } from './Crypto'
 
 const drawerWidth = 240
 
 type Section = 'keypairs' | 'tokens'
 
 function KeyPairsSection() {
+  const [modalOpen, setModalOpen] = useState(false)
+  const [keyPair, setKeyPair] = useState({ privateKey: '', publicKey: '' })
+
+  const handleGenerateKeyPair = async () => {
+    const { publicKeyPem, privateKeyPem } = await generateKeyPair()
+    setKeyPair({ privateKey: privateKeyPem, publicKey: publicKeyPem })
+    setModalOpen(true)
+  }
+
+  const handleCopy = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+    } catch (err) {
+      console.error('Failed to copy text: ', err)
+    }
+  }
+
   return (
-    <Container>
-      <SectionHeader
-        title="Generate Key Pairs"
-        description="Generate cryptographic key pairs for WebRTC communication."
-      />
-      <FormCard>
-      <Typography variant="body1" color="text.primary" sx={{ maxWidth: 480, mb: 1, textAlign: "start" }}>
-        This tool will generate an ECDSA key pair.
-        <br/>
-        The private key is PCKS8 encoded and the public key is SPKI encoded. Both are given in the PEM format.
-        <br/><br/>
-        Key generation happens transiently on the client side. You may verify the source code by clicking on "Source" on the sidebar.
-      </Typography>
-        <Button variant="contained" sx={{ alignSelf: "flex-start" }}>
-          Generate Key Pair
-        </Button>
-      </FormCard>
-    </Container>
+    <>
+      <Container>
+        <SectionHeader
+          title="Generate Key Pairs"
+          description="Generate cryptographic key pairs for WebRTC communication."
+        />
+        <FormCard>
+          <Typography variant="body1" color="text.primary" sx={{ maxWidth: 480, mb: 1, textAlign: "start" }}>
+            This tool will generate an ECDSA key pair.
+            <br/>
+            The private key is PCKS8 encoded and the public key is SPKI encoded. Both are given in the PEM format.
+            <br/><br/>
+            Key generation happens transiently on the client side. You may verify the source code by clicking on "Source" on the sidebar.
+          </Typography>
+          <Button variant="contained" sx={{ alignSelf: "flex-start" }} onClick={handleGenerateKeyPair}>
+            Generate Key Pair
+          </Button>
+        </FormCard>
+      </Container>
+
+      <Dialog open={modalOpen} onClose={() => setModalOpen(false)} maxWidth="md" fullWidth>
+        <DialogTitle>Generated Key Pair</DialogTitle>
+        <DialogContent>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
+            <CopyField text={keyPair.privateKey} title="Private Key" rows={6}/>
+            <CopyField text={keyPair.publicKey} title="Public Key" rows={4}/>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setModalOpen(false)}>Close</Button>
+        </DialogActions>
+      </Dialog>
+    </>
   )
 }
 
