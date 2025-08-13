@@ -69,10 +69,9 @@ export async function generateKeyPair(): Promise<KeyPair> {
     }
 }
 
-
-export async function generateToken(keypair: KeyPair, productId: string, deviceId: string, scope: string,) {
-    const privateKey = await jose.importPKCS8(keypair.privateKeyPem, "ES256");
-    const kid = await generateKid(keypair.publicKeyPem)
+export async function generateToken(publicKeyPem: string, privateKeyPem: string, productId: string, deviceId: string, scope: string,) {
+    const privateKey = await jose.importPKCS8(privateKeyPem, "ES256");
+    const kid = await generateKid(publicKeyPem)
     const resource = `urn:nabto:webrtc:${productId}:${deviceId}`
     const jwt = await (new jose.SignJWT({ scope: scope, resource: resource }))
         .setIssuedAt()

@@ -16,7 +16,6 @@ import {
   DialogContent,
   DialogTitle,
   Drawer,
-  IconButton,
   List,
   ListItem,
   ListItemButton,
@@ -26,11 +25,10 @@ import {
   Toolbar,
   Typography
 } from '@mui/material'
-import { ContentCopy as CopyIcon } from '@mui/icons-material'
 import FormCard from './components/FormCard'
 import SectionHeader from './components/SectionHeader'
 import CopyField from './components/CopyField'
-import { generateKeyPair } from './Crypto'
+import { generateKeyPair, generateToken } from './Crypto'
 
 const drawerWidth = 240
 
@@ -38,20 +36,12 @@ type Section = 'keypairs' | 'tokens'
 
 function KeyPairsSection() {
   const [modalOpen, setModalOpen] = useState(false)
-  const [keyPair, setKeyPair] = useState({ privateKey: '', publicKey: '' })
+  const [keyPair, setKeyPair] = useState({ privateKey: "", publicKey: "" })
 
   const handleGenerateKeyPair = async () => {
     const { publicKeyPem, privateKeyPem } = await generateKeyPair()
     setKeyPair({ privateKey: privateKeyPem, publicKey: publicKeyPem })
     setModalOpen(true)
-  }
-
-  const handleCopy = async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text)
-    } catch (err) {
-      console.error('Failed to copy text: ', err)
-    }
   }
 
   return (
@@ -79,8 +69,8 @@ function KeyPairsSection() {
         <DialogTitle>Generated Key Pair</DialogTitle>
         <DialogContent>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
-            <CopyField text={keyPair.privateKey} title="Private Key" rows={6}/>
-            <CopyField text={keyPair.publicKey} title="Public Key" rows={4}/>
+            <CopyField text={keyPair.privateKey} title="Private Key" rows={6} ext="pem"/>
+            <CopyField text={keyPair.publicKey} title="Public Key" rows={4} ext="pem"/>
           </Box>
         </DialogContent>
         <DialogActions>
@@ -92,23 +82,72 @@ function KeyPairsSection() {
 }
 
 function TokensSection() {
+  const [modalOpen, setModalOpen] = useState(false)
+  const [token, setToken] = useState("")
+
+  const [productId, setProductId] = useState("")
+  const [deviceId, setDeviceId] = useState("")
+  const [expiration, setExpiration] = useState(24)
+  const [publicKey, setPublicKey] = useState("")
+  const [privateKey, setPrivateKey] = useState("")
+
+  const handleGenerateToken = async () => {
+    const token = await generateToken(
+      publicKey,
+      privateKey,
+      productId,
+      deviceId,
+      "client:connect turn"
+    )
+    setToken(token)
+    setModalOpen(true)
+  }
+
   return (
+    <>
     <Container>
       <SectionHeader
         title="Generate Tokens"
         description="Generate access tokens for secure centralized connections over Nabto WebRTC."
       />
       <FormCard>
-      <Typography variant="body1" color="text.primary" sx={{ maxWidth: 480, mb: 1, textAlign: "start" }}>
-        Access token generation happens transiently on the client side, nothing is stored.
-        You may verify the source code by clicking on "Source" on the sidebar.
-      </Typography>
+        <Typography variant="body1" color="text.primary" sx={{ maxWidth: 480, mb: 1, textAlign: "start" }}>
+          Access token generation happens transiently on the client side, nothing is stored.
+          You may verify the source code by clicking on "Source" on the sidebar.
+        </Typography>
+        <TextField
+          label="Product ID"
+          type="number"
+          variant="outlined"
+          fullWidth
+          value={productId}
+          onChange={(e) => setProductId(e.target.value)}
+        />
+        <TextField
+          label="Device ID"
+          type="number"
+          variant="outlined"
+          fullWidth
+          value={deviceId}
+          onChange={(e) => setDeviceId(e.target.value)}
+        />
         <TextField
           label="Expiration (hours)"
           type="number"
           variant="outlined"
           fullWidth
-          defaultValue={24}
+          value={expiration}
+          onChange={(e) => setExpiration(Number(e.target.value))}
+        />
+        <TextField
+          label="Public Key"
+          type="text"
+          variant="outlined"
+          fullWidth
+          multiline
+          rows={4}
+          value={publicKey}
+          onChange={(e) => setPublicKey(e.target.value)}
         />
         <TextField
           label="Private Key"
@@ -116,13 +155,28 @@ function TokensSection() {
           variant="outlined"
           fullWidth
           multiline
-          rows={8}
+          rows={6}
+          value={privateKey}
+          onChange={(e) => setPrivateKey(e.target.value)}
         />
-        <Button variant="contained" sx={{ alignSelf: 'flex-start' }}>
+        <Button variant="contained" sx={{ alignSelf: 'flex-start' }} onClick={handleGenerateToken}>
           Generate Token
         </Button>
       </FormCard>
     </Container>
+
+    <Dialog open={modalOpen} onClose={() => setModalOpen(false)} maxWidth="md" fullWidth>
+        <DialogTitle>Generated Key Pair</DialogTitle>
+        <DialogContent>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
+            <CopyField text={token} title="Access Token" rows={6} ext="txt"/>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setModalOpen(false)}>Close</Button>
+        </DialogActions>
+      </Dialog>
+    </>
   )
 }
 
