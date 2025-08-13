@@ -5,6 +5,10 @@ export interface KeyPair {
     privateKeyPem: string,
 };
 
+function ab2str(buf: ArrayBuffer) {
+    return String.fromCharCode.apply(null, Array.from(new Uint8Array(buf)));
+}
+
 function str2ab(str: string) {
     const buf = new ArrayBuffer(str.length);
     const bufView = new Uint8Array(buf);
@@ -29,10 +33,6 @@ function buf2hex(buffer: ArrayBuffer) {
     return [...new Uint8Array(buffer)]
         .map(x => x.toString(16).padStart(2, '0'))
         .join('');
-}
-
-function ab2str(buf: ArrayBuffer) {
-    return String.fromCharCode.apply(null, Array.from(new Uint8Array(buf)));
 }
 
 async function generateKid(pemPublicKey: string) {
