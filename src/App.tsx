@@ -68,13 +68,13 @@ function KeyPairsSection() {
             <br/><br/>
             Key generation happens transiently on the client side. You may verify the source code by clicking on "Source" on the sidebar.
           </Typography>
-          <Button variant="contained" sx={{ alignSelf: "flex-start" }} onClick={handleGenerateKeyPair}>
+          <Button variant="contained" sx={{ alignSelf: "flex-start" }} onClick={() => { void handleGenerateKeyPair() }}>
             Generate Key Pair
           </Button>
         </FormCard>
       </Container>
 
-      <Dialog open={modalOpen} onClose={() => setModalOpen(false)} maxWidth="md" fullWidth>
+      <Dialog open={modalOpen} onClose={() => { setModalOpen(false) }} maxWidth="md" fullWidth>
         <DialogTitle>Generated Key Pair</DialogTitle>
         <DialogContent>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
@@ -83,7 +83,7 @@ function KeyPairsSection() {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setModalOpen(false)}>Close</Button>
+          <Button onClick={() => { setModalOpen(false) }}>Close</Button>
         </DialogActions>
       </Dialog>
     </>
@@ -258,7 +258,7 @@ function TokensSection() {
       </FormCard>
     </Container>
 
-    <Dialog open={modalOpen} onClose={() => setModalOpen(false)} maxWidth="md" fullWidth>
+    <Dialog open={modalOpen} onClose={() => { setModalOpen(false) }} maxWidth="md" fullWidth>
         <DialogTitle>Generated Key Pair</DialogTitle>
         <DialogContent>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
@@ -266,7 +266,7 @@ function TokensSection() {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setModalOpen(false)}>Close</Button>
+          <Button onClick={() => { setModalOpen(false) }}>Close</Button>
         </DialogActions>
       </Dialog>
     </>
@@ -324,7 +324,7 @@ function App() {
           <ListItem disablePadding>
             <ListItemButton
               selected={selectedSection === 'keypairs'}
-              onClick={() => setSelectedSection('keypairs')}
+              onClick={() => { setSelectedSection('keypairs') }}
             >
               <ListItemIcon>
                 <KeyIcon />
@@ -335,7 +335,7 @@ function App() {
           <ListItem disablePadding>
             <ListItemButton
               selected={selectedSection === 'tokens'}
-              onClick={() => setSelectedSection('tokens')}
+              onClick={() => { setSelectedSection('tokens') }}
             >
               <ListItemIcon>
                 <LockIcon />
@@ -346,7 +346,7 @@ function App() {
           <ListItem disablePadding>
             <ListItemButton
               selected={false}
-              onClick={() => {}}
+              onClick={() => { /* TODO: link to github pages */ }}
             >
               <ListItemIcon>
                 <CodeIcon />

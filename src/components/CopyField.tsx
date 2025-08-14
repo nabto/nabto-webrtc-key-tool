@@ -35,7 +35,7 @@ export default function CopyField({ text, title, rows, ext }: CopyFieldProps) {
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
         <Typography variant="h6">{title}</Typography>
         <Box>
-          <IconButton onClick={() => handleCopy(text)} size="small">
+          <IconButton onClick={() => { void handleCopy(text) }} size="small">
             <CopyIcon />
           </IconButton>
           <IconButton onClick={handleDownload} size="small">
@@ -49,7 +49,11 @@ export default function CopyField({ text, title, rows, ext }: CopyFieldProps) {
         fullWidth
         value={text}
         variant="outlined"
-        InputProps={{ readOnly: true }}
+        slotProps={{
+          input: {
+            readOnly: true
+          }
+        }}
         sx={{ fontFamily: 'monospace' }}
       />
     </Box>
