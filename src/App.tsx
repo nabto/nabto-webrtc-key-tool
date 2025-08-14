@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
 import {
   Key as KeyIcon,
@@ -34,6 +34,14 @@ import { isValidProductId, isValidDeviceId, isValidPemKey } from './Validation'
 const drawerWidth = 240
 
 type Section = 'keypairs' | 'tokens'
+
+const STORAGE_KEYS = {
+  PRODUCT_ID: 'nabto-productId',
+  DEVICE_ID: 'nabto-deviceId',
+  EXPIRATION: 'nabto-expiration',
+  PUBLIC_KEY: 'nabto-publicKey',
+  PRIVATE_KEY: 'nabto-privateKey'
+} as const
 
 function KeyPairsSection() {
   const [modalOpen, setModalOpen] = useState(false)
@@ -98,6 +106,20 @@ function TokensSection() {
     publicKey: "",
     privateKey: ""
   })
+
+  useEffect(() => {
+    const savedProductId = localStorage.getItem(STORAGE_KEYS.PRODUCT_ID)
+    const savedDeviceId = localStorage.getItem(STORAGE_KEYS.DEVICE_ID)
+    const savedExpiration = localStorage.getItem(STORAGE_KEYS.EXPIRATION)
+    const savedPublicKey = localStorage.getItem(STORAGE_KEYS.PUBLIC_KEY)
+    const savedPrivateKey = localStorage.getItem(STORAGE_KEYS.PRIVATE_KEY)
+
+    if (savedProductId) setProductId(savedProductId)
+    if (savedDeviceId) setDeviceId(savedDeviceId)
+    if (savedExpiration) setExpiration(Number(savedExpiration))
+    if (savedPublicKey) setPublicKey(savedPublicKey)
+    if (savedPrivateKey) setPrivateKey(savedPrivateKey)
+  }, [])
 
   const validateFields = () => {
     const newErrors = {
@@ -169,7 +191,10 @@ function TokensSection() {
           variant="outlined"
           fullWidth
           value={productId}
-          onChange={(e) => { setProductId(e.target.value) }}
+          onChange={(e) => { 
+            setProductId(e.target.value)
+            localStorage.setItem(STORAGE_KEYS.PRODUCT_ID, e.target.value)
+          }}
           error={errors.productId != ""}
           helperText={errors.productId}
         />
@@ -179,7 +204,10 @@ function TokensSection() {
           variant="outlined"
           fullWidth
           value={deviceId}
-          onChange={(e) => { setDeviceId(e.target.value) }}
+          onChange={(e) => { 
+            setDeviceId(e.target.value)
+            localStorage.setItem(STORAGE_KEYS.DEVICE_ID, e.target.value)
+          }}
           error={errors.deviceId != ""}
           helperText={errors.deviceId}
         />
@@ -189,7 +217,10 @@ function TokensSection() {
           variant="outlined"
           fullWidth
           value={expiration}
-          onChange={(e) => { setExpiration(Number(e.target.value)) }}
+          onChange={(e) => { 
+            setExpiration(Number(e.target.value))
+            localStorage.setItem(STORAGE_KEYS.EXPIRATION, e.target.value)
+          }}
         />
         <TextField
           label="Public Key"
@@ -199,7 +230,10 @@ function TokensSection() {
           multiline
           rows={4}
           value={publicKey}
-          onChange={(e) => { setPublicKey(e.target.value) }}
+          onChange={(e) => { 
+            setPublicKey(e.target.value)
+            localStorage.setItem(STORAGE_KEYS.PUBLIC_KEY, e.target.value)
+          }}
           error={errors.publicKey != ""}
           helperText={errors.publicKey}
         />
@@ -211,7 +245,10 @@ function TokensSection() {
           multiline
           rows={6}
           value={privateKey}
-          onChange={(e) => { setPrivateKey(e.target.value) }}
+          onChange={(e) => { 
+            setPrivateKey(e.target.value)
+            localStorage.setItem(STORAGE_KEYS.PRIVATE_KEY, e.target.value)
+          }}
           error={errors.privateKey != ""}
           helperText={errors.privateKey}
         />
