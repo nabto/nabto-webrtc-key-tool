@@ -1,0 +1,68 @@
+# Simple workflow for deploying static content to GitHub Pages
+name: Deploy to github pages
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets the GITHUB_TOKEN permissions to allow deployment to GitHub Pages
+permissions:
+  contents: read
+
+jobs:
+  # Single deploy job since we're just deploying
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        name: Install bun
+      - name: Build
+        run: |
+          bun install
+          bun build
+          bun lint
+        working-directory: ./
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: key-tool-dist
+          path: ./dist
+
+  deploy:
+    if: github.event_name == 'push'
+    # Allow one concurrent deployment
+    concurrency:
+      group: 'pages'
+      cancel-in-progress: true
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: key-tool-dist
+          path: ./dist
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Upload pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
