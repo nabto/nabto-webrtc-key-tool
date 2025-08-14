@@ -29,6 +29,7 @@ import FormCard from './components/FormCard'
 import SectionHeader from './components/SectionHeader'
 import CopyField from './components/CopyField'
 import { generateKeyPair, generateToken } from './Crypto'
+import { isValidProductId, isValidDeviceId, isValidPemKey } from './Validation'
 
 const drawerWidth = 240
 
@@ -85,13 +86,60 @@ function TokensSection() {
   const [modalOpen, setModalOpen] = useState(false)
   const [token, setToken] = useState("")
 
-  const [productId, setProductId] = useState("")
-  const [deviceId, setDeviceId] = useState("")
+  const [productId, setProductId]   = useState("")
+  const [deviceId, setDeviceId]     = useState("")
   const [expiration, setExpiration] = useState(24)
-  const [publicKey, setPublicKey] = useState("")
+  const [publicKey, setPublicKey]   = useState("")
   const [privateKey, setPrivateKey] = useState("")
 
+  const [errors, setErrors] = useState({
+    productId: "",
+    deviceId: "",
+    publicKey: "",
+    privateKey: ""
+  })
+
+  const validateFields = () => {
+    const newErrors = {
+      productId: "",
+      deviceId: "",
+      publicKey: "",
+      privateKey: ""
+    }
+
+    if (!productId.trim()) {
+      newErrors.productId = "Product ID is required"
+    } else if (!isValidProductId(productId)) {
+      newErrors.productId = "Product ID must start with 'wp-' and be lowercase"
+    }
+
+    if (!deviceId.trim()) {
+      newErrors.deviceId = "Device ID is required"
+    } else if (!isValidDeviceId(deviceId)) {
+      newErrors.deviceId = "Device ID must start with 'wd-' and be lowercase"
+    }
+
+    if (!publicKey.trim()) {
+      newErrors.publicKey = "Public key is required"
+    } else if (!isValidPemKey("public", publicKey)) {
+      newErrors.publicKey = "The provided key is not PEM formatted"
+    }
+
+    if (!privateKey.trim()) {
+      newErrors.privateKey = "Private key is required"
+    } else if (!isValidPemKey("private", privateKey)) {
+      newErrors.privateKey = "The provided key is not PEM formatted"
+    }
+
+    setErrors(newErrors)
+    return !Object.values(newErrors).some(error => error !== "")
+  }
+
   const handleGenerateToken = async () => {
+    if (!validateFields()) {
+      return
+    }
+
     const token = await generateToken(
       publicKey,
       privateKey,
@@ -117,19 +165,23 @@ function TokensSection() {
         </Typography>
         <TextField
           label="Product ID"
-          type="number"
+          type="text"
           variant="outlined"
           fullWidth
           value={productId}
-          onChange={(e) => setProductId(e.target.value)}
+          onChange={(e) => { setProductId(e.target.value) }}
+          error={errors.productId != ""}
+          helperText={errors.productId}
         />
         <TextField
           label="Device ID"
-          type="number"
+          type="text"
           variant="outlined"
           fullWidth
           value={deviceId}
-          onChange={(e) => setDeviceId(e.target.value)}
+          onChange={(e) => { setDeviceId(e.target.value) }}
+          error={errors.deviceId != ""}
+          helperText={errors.deviceId}
         />
         <TextField
           label="Expiration (hours)"
@@ -137,7 +189,7 @@ function TokensSection() {
           variant="outlined"
           fullWidth
           value={expiration}
-          onChange={(e) => setExpiration(Number(e.target.value))}
+          onChange={(e) => { setExpiration(Number(e.target.value)) }}
         />
         <TextField
           label="Public Key"
@@ -147,7 +199,9 @@ function TokensSection() {
           multiline
           rows={4}
           value={publicKey}
-          onChange={(e) => setPublicKey(e.target.value)}
+          onChange={(e) => { setPublicKey(e.target.value) }}
+          error={errors.publicKey != ""}
+          helperText={errors.publicKey}
         />
         <TextField
           label="Private Key"
@@ -157,9 +211,11 @@ function TokensSection() {
           multiline
           rows={6}
           value={privateKey}
-          onChange={(e) => setPrivateKey(e.target.value)}
+          onChange={(e) => { setPrivateKey(e.target.value) }}
+          error={errors.privateKey != ""}
+          helperText={errors.privateKey}
         />
-        <Button variant="contained" sx={{ alignSelf: 'flex-start' }} onClick={handleGenerateToken}>
+        <Button variant="contained" sx={{ alignSelf: 'flex-start' }} onClick={() => { void handleGenerateToken() }}>
           Generate Token
         </Button>
       </FormCard>

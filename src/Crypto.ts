@@ -19,8 +19,8 @@ function str2ab(str: string) {
 }
 
 function pemToDer(pem: string) {
-    const pemHeader = "-----BEGIN PRIVATE KEY-----";
-    const pemFooter = "-----END PRIVATE KEY-----";
+    const pemHeader = "-----BEGIN PUBLIC KEY-----";
+    const pemFooter = "-----END PUBLIC KEY-----";
     const pemContents = pem.substring(
         pemHeader.length,
         pem.length - pemFooter.length - 1,
