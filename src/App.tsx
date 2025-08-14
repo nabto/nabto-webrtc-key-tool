@@ -32,6 +32,7 @@ import { generateKeyPair, generateToken } from './Crypto'
 import { isValidProductId, isValidDeviceId, isValidPemKey } from './Validation'
 
 const drawerWidth = 240
+const githubPagesUrl = "https://nabto.github.io/nabto-webrtc-key-tool/"
 
 type Section = 'keypairs' | 'tokens'
 
@@ -346,7 +347,9 @@ function App() {
           <ListItem disablePadding>
             <ListItemButton
               selected={false}
-              onClick={() => { /* TODO: link to github pages */ }}
+              onClick={() => {
+                window.open(githubPagesUrl, "_blank")
+              }}
             >
               <ListItemIcon>
                 <CodeIcon />
