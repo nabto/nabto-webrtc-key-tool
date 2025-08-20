@@ -189,7 +189,7 @@ function TokensSection() {
         />
         <Stack direction="row" spacing={3} sx={{ width: '100%' }}>
           <Box>
-            <IconButton onClick={() => setHelpModalOpen(true)}>
+            <IconButton onClick={() => { setHelpModalOpen(true) }}>
               <HelpIcon />
             </IconButton>
           </Box>
