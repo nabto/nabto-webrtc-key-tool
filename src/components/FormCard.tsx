@@ -11,7 +11,7 @@ interface FormCardProps {
 
 export default function FormCard({ title, children }: FormCardProps) {
   return (
-    <Paper sx={{ p: 3, mt: 3 }}>
+    <Paper sx={{ p: 3, mt: 3 }} elevation={3}>
       { title ?
         (<Typography variant="h6" gutterBottom>
           {title}
